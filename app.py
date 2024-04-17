@@ -21,7 +21,7 @@ st.header("Gemini Application")
 type_prompt_list = ["Specific","Review"]
 type_prompt = st.selectbox("Type of Query",type_prompt_list)
 
-if type_prompt is not "Review":
+if type_prompt != "Review":
     input = st.text_input("Enter the Input Prompt",key="input")
 
     
@@ -38,12 +38,16 @@ if uploaded_file is not None:
 submit = st.button("Submit")
 
 if submit:
+    logging.info("----------------------------START------------------------------")
     image_data = input_image_setup(uploaded_file)
-    if type_prompt is not "Review":
+    if type_prompt != "Review":
         response = get_gemini_response(input,image_data,prompt_specific)
+        logging.info("Specific Question Response Loaded")
     else:
         response = get_gemini_response(review_input,image_data,prompt_review)
+        logging.info("Review Response Loaded.")
 
 
     st.subheader("The answer is as follows : ")
     st.write(response)
+    logging.info("----------------------------END------------------------------")
