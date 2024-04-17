@@ -6,6 +6,7 @@ import streamlit as st
 from PIL import Image
 import google.generativeai as genai
 from src.invoice_extractor.logger import logging
+from src.invoice_extractor.utils import input_image_setup, get_gemini_response
 
 load_dotenv()
 genai.configure(api_key = os.getenv('GOOGLE_API_KEY'))
@@ -24,5 +25,11 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image,caption="Uploaded Image",use_column_width=True)
     
-submit = st.button("Review the Invoice")
+type_prompt_list = ["Specific","Review"]
+type_prompt = st.selectbox("Type of Query",type_prompt_list)
+    
+submit = st.button("Submit")
 
+if submit:
+    image_data = input_image_setup(uploaded_file)
+    response = get_gemini_response()
