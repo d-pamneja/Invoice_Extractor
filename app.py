@@ -2,11 +2,12 @@
 
 from dotenv import load_dotenv
 import os
+import base64
 import streamlit as st
 from PIL import Image
 import google.generativeai as genai
 from src.invoice_extractor.logger import logging
-from src.invoice_extractor.utils import input_image_setup, get_gemini_response
+from src.invoice_extractor.utils import get_chatgpt_response,encode_image
 from src.invoice_extractor.prompts import review_input,prompt_review,prompt_specific
 
 load_dotenv()
@@ -29,8 +30,9 @@ uploaded_file = st.file_uploader("Chosse the invoice..",type=["jpg","jpeg","png"
 image = ""
 
 if uploaded_file is not None:
-    # Once the upload is done, display the image once to the user
     image = Image.open(uploaded_file)
+    image_path = os.path.join("./uploads",uploaded_file.name)
+    image.save(image_path)
     st.image(image,caption="Uploaded Image",use_column_width=True)
     
 
@@ -39,12 +41,14 @@ submit = st.button("Submit")
 
 if submit:
     logging.info("----------------------------START------------------------------")
-    image_data = input_image_setup(uploaded_file)
+    base64_image = encode_image(image_path)
     if type_prompt != "Review":
-        response = get_gemini_response(input,image_data,prompt_specific)
+        # response = get_gemini_response(input,image_data,prompt_specific) # GEMINI CODE - DO NOT ALTER
+        response = get_chatgpt_response(input,base64_image,prompt_specific)
         logging.info("Specific Question Response Loaded")
     else:
-        response = get_gemini_response(review_input,image_data,prompt_review)
+        # response = get_gemini_response(review_input,image_data,prompt_review) # GEMINI CODE - DO NOT ALTER
+        response = get_chatgpt_response(review_input,base64_image,prompt_review)
         logging.info("Review Response Loaded.")
 
 
